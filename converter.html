@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>ALI WADI CONVERTER</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f2f2f2;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 600px;
+            margin: 40px auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .header h1 {
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: #666;
+        }
+
+        .converter-box {
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 13px;
+            margin-bottom: 18px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            font-size: 16px;
+        }
+
+        button {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            background: #111;
+            color: white;
+            font-size: 17px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        button:hover {
+            opacity: 0.85;
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 18px;
+            background: #f5f5f5;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .copy-btn {
+            margin-top: 10px;
+            background: #444;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+
+        <div class="header">
+            <h1>ALI WADI CONVERTER</h1>
+            <p>محول الوحدات</p>
+        </div>
+
+        <div class="converter-box">
+
+            <label>نوع التحويل</label>
+
+            <select id="type" onchange="changeUnits()">
+                <option value="length">📏 الطول</option>
+                <option value="weight">⚖️ الوزن</option>
+                <option value="temperature">🌡️ الحرارة</option>
+                <option value="time">⏱️ الوقت</option>
+            </select>
+
+            <label>أدخل الرقم</label>
+
+            <input type="number" id="number" placeholder="اكتب الرقم هنا">
+
+            <label>من</label>
+
+            <select id="from"></select>
+
+            <label>إلى</label>
+
+            <select id="to"></select>
+
+            <button onclick="convert()">تحويل</button>
+
+            <div class="result" id="result">
+                النتيجة ستظهر هنا
+            </div>
+
+            <button class="copy-btn" onclick="copyResult()">
+                📋 نسخ النتيجة
+            </button>
+
+        </div>
+
+    </div>
+
+    <script>
+
+        const units = {
+            length: [
+                ["meter", "متر"],
+                ["kilometer", "كيلومتر"],
+                ["centimeter", "سنتيمتر"]
+            ],
+
+            weight: [
+                ["kilogram", "كيلوجرام"],
+                ["gram", "جرام"]
+            ],
+
+            temperature: [
+                ["celsius", "Celsius"],
+                ["fahrenheit", "Fahrenheit"]
+            ],
+
+            time: [
+                ["second", "ثانية"],
+                ["minute", "دقيقة"],
+                ["hour", "ساعة"]
+            ]
+        };
+
+
+        function changeUnits() {
+
+            const type = document.getElementById("type").value;
+
+            const from = document.getElementById("from");
+            const to = document.getElementById("to");
+
+            from.innerHTML = "";
+            to.innerHTML = "";
+
+            units[type].forEach(unit => {
+
+                const option1 = document.createElement("option");
+                option1.value = unit[0];
+                option1.textContent = unit[1];
+
+                const option2 = document.createElement("option");
+                option2.value = unit[0];
+                option2.textContent = unit[1];
+
+                from.appendChild(option1);
+                to.appendChild(option2);
+
+            });
+        }
+
+
+        function convert() {
+
+            const number = parseFloat(
+                document.getElementById("number").value
+            );
+
+            const from = document.getElementById("from").value;
+            const to = document.getElementById("to").value;
+            const type = document.getElementById("type").value;
+
+            if (isNaN(number)) {
+                document.getElementById("result").textContent =
+                    "⚠️ اكتب رقم أولاً";
+                return;
+            }
+
+            let result;
+
+
+            // الطول
+            if (type === "length") {
+
+                let meters;
+
+                if (from === "meter") meters = number;
+                if (from === "kilometer") meters = number * 1000;
+                if (from === "centimeter") meters = number / 100;
+
+                if (to === "meter") result = meters;
+                if (to === "kilometer") result = meters / 1000;
+                if (to === "centimeter") result = meters * 100;
+
+            }
+
+
+            // الوزن
+            if (type === "weight") {
+
+                let grams;
+
+                if (from === "gram") grams = number;
+                if (from === "kilogram") grams = number * 1000;
+
+                if (to === "gram") result = grams;
+                if (to === "kilogram") result = grams / 1000;
+
+            }
+
+
+            // الحرارة
+            if (type === "temperature") {
+
+                if (from === to) {
+                    result = number;
+                }
+
+                else if (from === "celsius") {
+                    result = (number * 9 / 5) + 32;
+                }
+
+                else if (from === "fahrenheit") {
+                    result = (number - 32) * 5 / 9;
+                }
+
+            }
+
+
+            // الوقت
+            if (type === "time") {
+
+                let seconds;
+
+                if (from === "second") seconds = number;
+                if (from === "minute") seconds = number * 60;
+                if (from === "hour") seconds = number * 3600;
+
+                if (to === "second") result = seconds;
+                if (to === "minute") result = seconds / 60;
+                if (to === "hour") result = seconds / 3600;
+
+            }
+
+
+            document.getElementById("result").textContent =
+                "النتيجة: " + result;
+        }
+
+
+        function copyResult() {
+
+            const result = document.getElementById("result").textContent;
+
+            navigator.clipboard.writeText(result);
+
+            alert("✅ تم نسخ النتيجة");
+
+        }
+
+
+        changeUnits();
+
+    </script>
+
+</body>
+</html>
